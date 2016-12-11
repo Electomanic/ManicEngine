@@ -79,24 +79,21 @@ namespace Nantuko.ManicEngine
                 short xMax = (short) (xOrg+1);
                 short yMax = (short) (xOrg+1);
 
-                if (xOrg >= _lowAddress)  xMin = _lowAddress;
-                if (xOrg <= _highAddress) xMax = _highAddress;
-                if (yOrg >= _lowAddress)  yMin = _lowAddress;
-                if (yOrg <= _highAddress) yMax = _highAddress;
+                if (xOrg <= _lowAddress)  xMin = _lowAddress;
+                if (xOrg >= _highAddress) xMax = _highAddress;
+                if (yOrg <= _lowAddress)  yMin = _lowAddress;
+                if (yOrg >= _highAddress) yMax = _highAddress;
 
-                MapCordinate lowerBound = new MapCordinate((short)(xMin - 1), (short)(yMin - 1));
-                MapCordinate upperBound = new MapCordinate((short)(xMax + 1), (short)(yMax + 1)); ;
+                MapCordinate lowerBound = new MapCordinate(xMin, yMin);
+                MapCordinate upperBound = new MapCordinate(xMax, yMax);
 
                 Tile[,] tiles = GetTiles(lowerBound, upperBound);
 
-                for (int x = 0; x < 3; x++)
+                for (int x = 0; x < tiles.GetLength(0); x++)
                 {
-                    for (int y = 0; y < 3; y++)
+                    for (int y = 0; y < tiles.GetLength(1); y++)
                     {
-                        if (x != 1 && y != 1)
-                        {
-                            if(tiles[x, y] != null) tileList.Add(tiles[x, y]);
-                        }
+                        if(tile != tiles[x, y] && tiles[x, y] != null) tileList.Add(tiles[x, y]);
                     }
                 }
             }
@@ -188,7 +185,7 @@ namespace Nantuko.ManicEngine
                     _tileDictionary.Add(tile, cordinate);
 
                     var neighbours = GetBorderingTiles(tile);
-                    tile.Neighbours = GetBorderingTiles(tile);
+                    tile.Neighbours = neighbours;
 
                     if (tile.Neighbours != null) foreach (var neighbour in neighbours)
                     {
