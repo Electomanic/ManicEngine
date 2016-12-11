@@ -24,31 +24,45 @@ namespace Nantuko.ManicEngine
     public class Border
     {
         /// <summary>
-        /// Calculates the unique borderId for a pair two pairs of x-y cordinates
+        /// Calculates the unique borderId for a pair of MapCordinates
         /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
+        /// <param name="mapCordinate1"></param>
+        /// <param name="mapCordinate2"></param>
         /// <returns>The generated border if sucessfull or 0 if not</returns>
-        public static long CalculateBorderId(short x1, short y1, short x2, short y2)
+        public static long CalculateBorderId(MapCordinate mapCordinate1, MapCordinate mapCordinate2)
         {
             long borderId;
 
-            long cordinate1 = (ushort)x1 << 16 | (ushort)y1;
-            long cordinate2 = (ushort)x2 << 16 | (ushort)y2;
+            if (AreNeighbours(mapCordinate1, mapCordinate2))
+            {
+                long cordinate1 = (ushort)mapCordinate1.X << 16 | (ushort)mapCordinate1.Y;
+                long cordinate2 = (ushort)mapCordinate2.X << 16 | (ushort)mapCordinate2.Y;
 
-            if (cordinate1 == cordinate2) borderId = 0;
-
-            else if (cordinate1 < cordinate2) borderId = cordinate1 << 32 | cordinate2;
-            else borderId =                              cordinate2 << 32 | cordinate1;
+                if (cordinate1 < cordinate2) borderId = cordinate1 << 32 | cordinate2;
+                else borderId = cordinate2 << 32 | cordinate1;
+            }
+            else
+            {
+                borderId = 0;
+            }
 
             return borderId;
         }
 
-        public static long CalculateBorderId(MapCordinate cordinate1, MapCordinate cordinate2)
+        private static bool AreNeighbours(MapCordinate mapCordinate1, MapCordinate mapCordinate2)
         {
-            return CalculateBorderId(cordinate1.X, cordinate1.Y, cordinate2.X, cordinate2.Y);
+            bool areNeighbours;
+
+            var xMin = mapCordinate1.X < mapCordinate2.X ? mapCordinate1.X : mapCordinate2.X;
+            var yMin = mapCordinate1.Y < mapCordinate2.Y ? mapCordinate1.Y : mapCordinate2.Y;
+            var xMax = mapCordinate1.X > mapCordinate2.X ? mapCordinate1.X : mapCordinate2.X;
+            var yMax = mapCordinate1.Y > mapCordinate2.Y ? mapCordinate1.Y : mapCordinate2.Y;
+
+            if      (xMin == xMax && yMin == yMax)       areNeighbours = false;
+            else if (xMin + 1 < xMax && yMin + 1 < yMax) areNeighbours = false;
+            else                                         areNeighbours = true;
+
+            return areNeighbours;
         }
     }
 }
