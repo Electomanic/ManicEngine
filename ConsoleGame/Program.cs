@@ -17,8 +17,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using Nantuko.ManicEngine;
@@ -27,20 +27,42 @@ namespace ConsoleGame
 {
     class Program
     {
+        private static readonly Stopwatch Stopwatch = new Stopwatch();
+
         static void Main(string[] args)
         {
+            Console.Title = "ManicEngine - ConsoleDemo";
+
             MapCordinate renderMin = new MapCordinate(-5, -5);
             MapCordinate renderMax = new MapCordinate(5, 5);
 
-            World world = new World(3);
+            const ushort size = 5;
+            const long seed = 4768642378678;
+            
+            World world = new World(size, seed);
 
+            Stopwatch.Start();
             world.CreateAllTiles();
+            Stopwatch.Stop();
+
+            Console.WriteLine("World creation time: " + Stopwatch.ElapsedMilliseconds + " ms");
+            Console.ReadLine();
 
             var tilesToRender = world.GetTiles(renderMin, renderMax);
 
             for (;;)
             {
+                Console.Clear();
+                Console.WriteLine("Frame render time: " + Stopwatch.ElapsedMilliseconds + "ms");
+                Console.WriteLine();
+
+                Stopwatch.Reset();
+                Stopwatch.Start();
+
                 RenderTiles(tilesToRender);
+
+                Stopwatch.Stop();
+
                 Thread.Sleep(500);
             }
         }
@@ -53,8 +75,6 @@ namespace ConsoleGame
         {
             char mapWith = (char) (tiles.GetLength(1));
             char mapHeight = (char) (tiles.GetLength(1));
-
-            Console.Clear();
 
             for (int y = mapHeight - 1; y > -1; y--)
             {
@@ -70,7 +90,7 @@ namespace ConsoleGame
                     }
                     else
                     {
-                        Console.Write("     ");
+                        Console.Write("      ");
                     }
                 }
                 Console.WriteLine();
@@ -82,7 +102,7 @@ namespace ConsoleGame
 
             for (int i = 0; i < mapWith; i++)
             {
-                Console.Write(i + "    ");
+                Console.Write(i + "     ");
             }
         }
     }

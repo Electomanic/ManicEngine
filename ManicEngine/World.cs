@@ -33,11 +33,15 @@ namespace Nantuko.ManicEngine
         private readonly Dictionary<Tile, MapCordinate> _tileDictionary;
         private readonly Tile[,] _tileMap;
 
+        private readonly OpenSimplexNoise _simplexNoise ;
+
         internal delegate List<Tile> GetBordeingTilesDelegate(Tile tile);
 
-        public World(ushort maxAdress)
+        public World(ushort maxAdress, long seed)
         {
             if (maxAdress*2 + 1 > short.MaxValue) throw new ArgumentOutOfRangeException("Max world size is: " + (maxAdress*2 + 1) + " Size requested was: " + maxAdress);
+
+            _simplexNoise = new OpenSimplexNoise(seed);
 
             var size = maxAdress*2 + 1;
 
@@ -63,7 +67,6 @@ namespace Nantuko.ManicEngine
             }
         }
 
-        // TODO not working
         internal List<Tile> GetBorderingTiles(Tile tile)
         {
             MapCordinate tileCordinate = GetTileCordinate(tile);
@@ -180,6 +183,18 @@ namespace Nantuko.ManicEngine
                 if (_tileMap[arrayCordinate.X, arrayCordinate.Y] == null)
                 {
                     Tile tile = new Tile(cordinate.X, cordinate.Y);
+
+                    foreach (var name in TileProperty.GetTypeNames())
+                    {
+                        var property = TileProperty.GetType(name);
+                        float value = (float)_simplexNoise.Evaluate(cordinate.X, cordinate.Y);
+
+                        value = (value + 1)/2;
+
+                        value = value * (property.MaxInitialValue - property.MinInitialValue) + property.MinInitialValue;
+
+                        tile.SetTileStat(property, value);
+                    }
 
                     _tileMap[arrayCordinate.X, arrayCordinate.Y] = tile;
                     _tileDictionary.Add(tile, cordinate);
