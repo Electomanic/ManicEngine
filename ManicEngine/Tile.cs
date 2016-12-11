@@ -21,58 +21,46 @@ using System.Collections.Generic;
 
 namespace Nantuko.ManicEngine
 {
-    public enum TileStatType
-    {
-        Food,
-        Temperature,
-        Humidity,
-    }
+
 
     public class Tile
     {
-        private readonly Dictionary<TileStatType, float> _tileStatsDictionary;
-        private List<Tile> _neighbours;
+        private readonly Dictionary<TilePropertyType, float> _tileStatsDictionary;
 
         // TODO remove temporary debugging cordinates
         private short _x;
         private short _y;
 
-        public List<Tile> Neighbours
-        {
-            get { return _neighbours; }
-            internal set
-            {
-                _neighbours = value;
-            }
-        }
+        public List<Tile> Neighbours { get; internal set; }
+        public List<Border> Borders { get; internal set; }
 
         internal Tile(short x, short y)
         {
             _x = x;
             _y = y;
-            _tileStatsDictionary=new Dictionary<TileStatType, float>();
+            _tileStatsDictionary=new Dictionary<TilePropertyType, float>();
         }
 
-        public float GetStat(TileStatType stat)
+        public float GetStat(TilePropertyType stat)
         {
             return _tileStatsDictionary.ContainsKey(stat) ? _tileStatsDictionary[stat] : 0f;
         }
 
-        public float IncrementTileStatBy(TileStatType stat, float value)
+        public float IncrementTileStatBy(TilePropertyType stat, float value)
         {
             float newValue = GetStat(stat) + value;
             SetTileStat(stat, newValue);
             return newValue;
         }
 
-        public float DecrementTileStatBy(TileStatType stat, float value)
+        public float DecrementTileStatBy(TilePropertyType stat, float value)
         {
             float newValue = GetStat(stat) - value;
             SetTileStat(stat, newValue);
             return newValue;
         }
 
-        public void SetTileStat(TileStatType stat, float value)
+        public void SetTileStat(TilePropertyType stat, float value)
         {
             if (_tileStatsDictionary.ContainsKey(stat)) _tileStatsDictionary[stat] = value;
             else _tileStatsDictionary.Add(stat,value);

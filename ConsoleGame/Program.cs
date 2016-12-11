@@ -18,8 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Nantuko.ManicEngine;
 
 namespace ConsoleGame
@@ -28,22 +29,61 @@ namespace ConsoleGame
     {
         static void Main(string[] args)
         {
-            MapCordinate c1 = new MapCordinate(5, 5);
-            MapCordinate c2 = new MapCordinate(0, 0);
-            MapCordinate c3 = new MapCordinate(-1, 1);
-            MapCordinate c4 = new MapCordinate(2, 5);
+            MapCordinate renderMin = new MapCordinate(-5, -5);
+            MapCordinate renderMax = new MapCordinate(5, 5);
 
-            World world = new World(1);
-
-            //world.CreateTile(c4);
-            //var tile1 = world.GetTile(c4); //OK
-            //var c5 = world.GetTileCordinate(tile1);
+            World world = new World(3);
 
             world.CreateAllTiles();
 
-            //var tile2 = world.GetTile(c3); //OK
-            //var tiles = world.GetTiles(c1, c2); //OK
+            var tilesToRender = world.GetTiles(renderMin, renderMax);
 
+            for (;;)
+            {
+                RenderTiles(tilesToRender);
+                Thread.Sleep(500);
+            }
+        }
+
+        /// <summary>
+        /// Quick console renderer for testing the engine
+        /// </summary>
+        /// <param name="tiles">The part of the world to render</param>
+        private static void RenderTiles(Tile[,] tiles)
+        {
+            char mapWith = (char) (tiles.GetLength(1));
+            char mapHeight = (char) (tiles.GetLength(1));
+
+            Console.Clear();
+
+            for (int y = mapHeight - 1; y > -1; y--)
+            {
+                Console.Write(y + "\t");
+
+                for (int x = 0; x < mapWith; x++)
+                {
+                    if (tiles[x, y] != null)
+                    {
+                        //Console.ForegroundColor = C
+                        float temperature = tiles[x, y].GetStat(TileProperty.GetType("Temperature"));
+                        Console.Write("[" + temperature.ToString("F1") + "]");
+                    }
+                    else
+                    {
+                        Console.Write("     ");
+                    }
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.Write("\t  ");
+
+            for (int i = 0; i < mapWith; i++)
+            {
+                Console.Write(i + "    ");
+            }
         }
     }
 }

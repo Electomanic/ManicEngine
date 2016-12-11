@@ -47,7 +47,9 @@
   <ItemGroup>
     <Compile Include="Border.cs" />
     <Compile Include="MapCordinate.cs" />
+    <Compile Include="OpenSimplexNoise.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TileProperty.cs" />
     <Compile Include="World.cs" />
     <Compile Include="Tile.cs" />
   </ItemGroup>
