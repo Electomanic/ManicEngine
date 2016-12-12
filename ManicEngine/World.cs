@@ -69,6 +69,8 @@ namespace Nantuko.ManicEngine
 
         internal List<Tile> GetBorderingTiles(Tile tile)
         {
+            return null;
+
             MapCordinate tileCordinate = GetTileCordinate(tile);
             List<Tile> tileList = new List<Tile>();
 
@@ -187,7 +189,9 @@ namespace Nantuko.ManicEngine
                     foreach (var name in TileProperty.GetTypeNames())
                     {
                         var property = TileProperty.GetType(name);
-                        float value = (float)_simplexNoise.Evaluate(cordinate.X, cordinate.Y);
+                        double divider = 100.0;
+
+                        float value = (float)_simplexNoise.Evaluate(cordinate.X / divider, cordinate.Y / divider);
 
                         value = (value + 1)/2;
 

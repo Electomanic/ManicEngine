@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManicEngineTests", "ManicEngineTests\ManicEngineTests.csproj", "{69E5CD92-6D51-4D89-8445-9D9E9BCDCE3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenGLGame", "OpenGLGame\OpenGLGame.csproj", "{321369F3-422F-4C13-BEA3-3DB0A7EA492A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{69E5CD92-6D51-4D89-8445-9D9E9BCDCE3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E5CD92-6D51-4D89-8445-9D9E9BCDCE3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E5CD92-6D51-4D89-8445-9D9E9BCDCE3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321369F3-422F-4C13-BEA3-3DB0A7EA492A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321369F3-422F-4C13-BEA3-3DB0A7EA492A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321369F3-422F-4C13-BEA3-3DB0A7EA492A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321369F3-422F-4C13-BEA3-3DB0A7EA492A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
