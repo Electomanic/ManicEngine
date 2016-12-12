@@ -15,7 +15,7 @@ namespace OpenGLGame
             using (RenderWindow window = new RenderWindow())
             {
                 window.Title = "ManicEngine - View";
-                window.Run(30, 30);
+                window.Run(200, 200);
             }
         }
     }

@@ -18,20 +18,21 @@ namespace OpenGLGame
 
         private Tile[,] _tilesToRender;
         private readonly World _world;
+        private readonly Random _random = new Random();
+        private const short size = 256;
+
+        MapCordinate renderMin = new MapCordinate(-size, -size);
+        MapCordinate renderMax = new MapCordinate(size, size);
 
         public RenderWindow()
         {
             Console.Title = "ManicEngine - Log";
 
-            MapCordinate renderMin = new MapCordinate(-25, -25);
-            MapCordinate renderMax = new MapCordinate(25, 25);
 
-            Random random = new Random();
+            long seed = _random.Next(int.MinValue, int.MaxValue); //4768642378678;
 
-            const ushort size = 25;
-            long seed = random.Next(int.MinValue, int.MaxValue); //4768642378678;
+            _world = new World((ushort)Math.Abs(size), seed);
 
-            _world = new World(size, seed);
 
             Console.WriteLine("Creating World of size " + size + " with seed " + seed);
 
@@ -41,10 +42,31 @@ namespace OpenGLGame
 
             Console.WriteLine("World creation time: " + Stopwatch.ElapsedMilliseconds + " ms");
 
+
+
             _tilesToRender = _world.GetTiles(renderMin, renderMax);
 
             RenderFrame += RenderFrameEventHandler;
             Resize += ResizeEventHandler;
+            
+            /*
+            Thread genThread= new Thread(GenThread);
+            genThread.Start();
+            */
+        }
+
+
+        private void GenThread()
+        {
+            for (;;)
+            {
+                for (int i = 0; i < 10000; i++)
+                {
+                    MapCordinate newCordinate = new MapCordinate((short)_random.Next(-size, size), (short)_random.Next(-size, size));
+                    _world.CreateTile(newCordinate);
+                }
+                _tilesToRender = _world.GetTiles(renderMin, renderMax);
+            }
         }
 
         private void ResizeEventHandler(object sender, EventArgs e)

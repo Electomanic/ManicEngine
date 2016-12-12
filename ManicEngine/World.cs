@@ -62,44 +62,50 @@ namespace Nantuko.ManicEngine
             {
                 for (short y = _lowAddress; y <= _highAddress; y++)
                 {
-                    CreateTile(new MapCordinate(x, y));
+                    CreateTile(new MapCordinate(x, y),false);
+                }
+            }
+
+            foreach (var tile in _tileMap)
+            {
+                var neighbours = GetBorderingTiles(tile);
+
+                if (neighbours != null)
+                {
+                    tile.Neighbours = neighbours;
                 }
             }
         }
 
         internal List<Tile> GetBorderingTiles(Tile tile)
         {
-            return null;
+            //return null;
 
-            MapCordinate tileCordinate = GetTileCordinate(tile);
             List<Tile> tileList = new List<Tile>();
 
-            if (tileCordinate != null)
+            short xOrg = tile.X;
+            short yOrg = tile.Y;
+
+            short xMin = (short) (xOrg - 1);
+            short yMin = (short) (yOrg - 1);
+            short xMax = (short) (xOrg + 1);
+            short yMax = (short) (xOrg + 1);
+
+            if (xOrg <= _lowAddress) xMin = _lowAddress;
+            if (xOrg >= _highAddress) xMax = _highAddress;
+            if (yOrg <= _lowAddress) yMin = _lowAddress;
+            if (yOrg >= _highAddress) yMax = _highAddress;
+
+            MapCordinate lowerBound = new MapCordinate(xMin, yMin);
+            MapCordinate upperBound = new MapCordinate(xMax, yMax);
+
+            Tile[,] tiles = GetTiles(lowerBound, upperBound);
+
+            for (int x = 0; x < tiles.GetLength(0); x++)
             {
-                short xOrg = tileCordinate.X;
-                short yOrg = tileCordinate.Y;
-
-                short xMin = (short) (xOrg-1);
-                short yMin = (short) (yOrg-1);
-                short xMax = (short) (xOrg+1);
-                short yMax = (short) (xOrg+1);
-
-                if (xOrg <= _lowAddress)  xMin = _lowAddress;
-                if (xOrg >= _highAddress) xMax = _highAddress;
-                if (yOrg <= _lowAddress)  yMin = _lowAddress;
-                if (yOrg >= _highAddress) yMax = _highAddress;
-
-                MapCordinate lowerBound = new MapCordinate(xMin, yMin);
-                MapCordinate upperBound = new MapCordinate(xMax, yMax);
-
-                Tile[,] tiles = GetTiles(lowerBound, upperBound);
-
-                for (int x = 0; x < tiles.GetLength(0); x++)
+                for (int y = 0; y < tiles.GetLength(1); y++)
                 {
-                    for (int y = 0; y < tiles.GetLength(1); y++)
-                    {
-                        if(tile != tiles[x, y] && tiles[x, y] != null) tileList.Add(tiles[x, y]);
-                    }
+                    if (tile != tiles[x, y] && tiles[x, y] != null) tileList.Add(tiles[x, y]);
                 }
             }
 
@@ -176,6 +182,11 @@ namespace Nantuko.ManicEngine
 
         public bool CreateTile(MapCordinate cordinate)
         {
+            return CreateTile(cordinate, true);
+        }
+
+        private bool CreateTile(MapCordinate cordinate, bool calculateNeighbours)
+        {
             bool creationSucessfull = false;
 
             if (IsTileCordinateValid(cordinate))
@@ -191,7 +202,7 @@ namespace Nantuko.ManicEngine
                         var property = TileProperty.GetType(name);
                         double divider = 100.0;
 
-                        float value = (float)_simplexNoise.Evaluate(cordinate.X / divider, cordinate.Y / divider);
+                        float value = (float)_simplexNoise.Evaluate(cordinate.X / divider, cordinate.Y / divider,6,0.7);
 
                         value = (value + 1)/2;
 
@@ -203,12 +214,19 @@ namespace Nantuko.ManicEngine
                     _tileMap[arrayCordinate.X, arrayCordinate.Y] = tile;
                     _tileDictionary.Add(tile, cordinate);
 
-                    var neighbours = GetBorderingTiles(tile);
-                    tile.Neighbours = neighbours;
-
-                    if (tile.Neighbours != null) foreach (var neighbour in neighbours)
+                    if (calculateNeighbours)
                     {
-                        if(neighbour != null) neighbour.Neighbours = GetBorderingTiles(neighbour);
+                        var neighbours = GetBorderingTiles(tile);
+
+                        if (neighbours != null)
+                        {
+                            tile.Neighbours = neighbours;
+
+                            foreach (var neighbour in neighbours)
+                            {
+                                neighbour?.Neighbours.Add(tile);
+                            }
+                        }
                     }
 
                     creationSucessfull = true;

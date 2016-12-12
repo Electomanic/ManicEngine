@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Nantuko.ManicEngine
 {
-    public struct TileProperty
+    public class TileProperty
     {
         private static readonly Dictionary<string,TilePropertyType> TilePropertyTypeDictionary;
 
@@ -60,7 +60,7 @@ namespace Nantuko.ManicEngine
         }
     }
 
-    public struct TilePropertyType
+    public class TilePropertyType
     {
         public string Name { get; }
         public float MinValue { get; }
