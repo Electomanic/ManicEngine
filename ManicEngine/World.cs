@@ -197,18 +197,19 @@ namespace Nantuko.ManicEngine
                 {
                     Tile tile = new Tile(cordinate.X, cordinate.Y);
 
-                    foreach (var name in TileProperty.GetTypeNames())
+                    int i = 0;
+                    foreach (var type in TileProperty.GetTypes())
                     {
-                        var property = TileProperty.GetType(name);
                         double divider = 100.0;
 
                         float value = (float)_simplexNoise.Evaluate(cordinate.X / divider, cordinate.Y / divider,6,0.7);
 
                         value = (value + 1)/2;
 
-                        value = value * (property.MaxInitialValue - property.MinInitialValue) + property.MinInitialValue;
+                        value = value * (type.MaxInitialValue - type.MinInitialValue) + type.MinInitialValue;
 
-                        tile.SetTileStat(property, value);
+                        tile.SetTileStat(i, value);
+                        i++;
                     }
 
                     _tileMap[arrayCordinate.X, arrayCordinate.Y] = tile;

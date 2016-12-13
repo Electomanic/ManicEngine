@@ -19,7 +19,7 @@ namespace OpenGLGame
         private Tile[,] _tilesToRender;
         private readonly World _world;
         private readonly Random _random = new Random();
-        private const short size = 256;
+        private const short size = 64;
 
         MapCordinate renderMin = new MapCordinate(-size, -size);
         MapCordinate renderMax = new MapCordinate(size, size);
@@ -107,7 +107,7 @@ namespace OpenGLGame
                     if (_tilesToRender[x, y] != null)
                     {
                         var cordinate = _world.GetTileCordinate(_tilesToRender[x, y]);
-                        float temperature = _tilesToRender[x, y].GetStat(TileProperty.GetType("Temperature"));
+                        float temperature = _tilesToRender[x, y].GetStat(0);
                         Color4 color = new Color4(temperature/100, temperature/100, temperature/100,1f);
 
                         DrawRectangle(cordinate, 1f, 1f, color);

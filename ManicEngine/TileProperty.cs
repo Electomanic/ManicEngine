@@ -25,38 +25,51 @@ namespace Nantuko.ManicEngine
 {
     public class TileProperty
     {
-        private static readonly Dictionary<string,TilePropertyType> TilePropertyTypeDictionary;
-
-        public TilePropertyType Type { get; private set; }
+        public int TilePropertyTypeIndex { get; private set; }
         public float Value { get; set; }
 
-        public TileProperty(TilePropertyType type, float value)
+        public TileProperty(int typeIndex, float value)
         {
-            Type = type;
+            TilePropertyTypeIndex = typeIndex;
             Value = value;
         }
+
+        /* Static below */
+
+        private static readonly TilePropertyType[] TileProperties;
 
         static TileProperty()
         {
             // TODO Read types from file
-            TilePropertyTypeDictionary = new Dictionary<string, TilePropertyType>
+            TileProperties = new TilePropertyType[]
             {
-                {"Invalid", new TilePropertyType("Invalid", 0, 0, 0, 0, 0)},
-                {"Temperature", new TilePropertyType("Temperature", -40, 60, 15, 30, 0.1f)}
+                new TilePropertyType("Temperature", -40, 60, 15, 30, 0.1f)
             };
         }
 
-        public static TilePropertyType GetType(string typeName)
+        public static TilePropertyType[] GetTypes()
         {
-            return TilePropertyTypeDictionary.ContainsKey(typeName) ? TilePropertyTypeDictionary[typeName] : TilePropertyTypeDictionary["Invalid"];
+            return TileProperties;
         }
 
-        public static List<string> GetTypeNames()
+        public static TilePropertyType GetType(int index)
         {
-            var list = new List<string>(TilePropertyTypeDictionary.Keys);
-            if (list.Contains("Invalid")) list.Remove("Invalid");
+            TilePropertyType type = null;
 
-            return list;
+            if(index <= TileProperties.Length) type = TileProperties[index];
+            return type;
+        }
+
+        public static string[] GetTypeNames()
+        {
+            string[] strings = new string[TileProperties.Length];
+
+            for (int i = 0; i < TileProperties.Length; i++)
+            {
+                strings[i] = TileProperties[i].Name;
+            }
+
+            return strings;
         }
     }
 

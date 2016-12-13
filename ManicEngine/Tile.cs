@@ -25,7 +25,7 @@ namespace Nantuko.ManicEngine
 
     public class Tile
     {
-        private readonly Dictionary<TilePropertyType, float> _tileStatsDictionary;
+        private readonly Dictionary<int, float> _tileStatsDictionary;
 
         public short X { get; }
         public short Y { get; }
@@ -37,29 +37,29 @@ namespace Nantuko.ManicEngine
         {
             X = x;
             Y = y;
-            _tileStatsDictionary=new Dictionary<TilePropertyType, float>();
+            _tileStatsDictionary=new Dictionary<int, float>();
         }
 
-        public float GetStat(TilePropertyType stat)
+        public float GetStat(int typeindex)
         {
-            return _tileStatsDictionary.ContainsKey(stat) ? _tileStatsDictionary[stat] : 0f;
+            return _tileStatsDictionary.ContainsKey(typeindex) ? _tileStatsDictionary[typeindex] : 0f;
         }
 
-        public float IncrementTileStatBy(TilePropertyType stat, float value)
+        public float IncrementTileStatBy(int stat, float value)
         {
             float newValue = GetStat(stat) + value;
             SetTileStat(stat, newValue);
             return newValue;
         }
 
-        public float DecrementTileStatBy(TilePropertyType stat, float value)
+        public float DecrementTileStatBy(int stat, float value)
         {
             float newValue = GetStat(stat) - value;
             SetTileStat(stat, newValue);
             return newValue;
         }
 
-        public void SetTileStat(TilePropertyType stat, float value)
+        public void SetTileStat(int stat, float value)
         {
             if (_tileStatsDictionary.ContainsKey(stat)) _tileStatsDictionary[stat] = value;
             else _tileStatsDictionary.Add(stat,value);
