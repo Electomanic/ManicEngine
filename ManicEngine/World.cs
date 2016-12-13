@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using OpenTK;
 
 namespace Nantuko.ManicEngine
 {
@@ -28,14 +29,8 @@ namespace Nantuko.ManicEngine
     {
         private readonly short _lowAddress;
         private readonly short _highAddress;
-
-        private readonly Dictionary<long, Border> _borderDictionary;
-        private readonly Dictionary<Tile, MapCordinate> _tileDictionary;
         private readonly Tile[,] _tileMap;
-
         private readonly OpenSimplexNoise _simplexNoise ;
-
-        internal delegate List<Tile> GetBordeingTilesDelegate(Tile tile);
 
         public World(ushort maxAdress, long seed)
         {
@@ -49,20 +44,20 @@ namespace Nantuko.ManicEngine
             _highAddress = (short) maxAdress;
 
             _tileMap = new Tile[size, size];
-            _tileDictionary = new Dictionary<Tile, MapCordinate>();
-            _borderDictionary = new Dictionary<long, Border>();
         }
 
-        /// <summary>
-        /// Only for debugging
-        /// </summary>
+        public int TileCount
+        {
+            get { return _tileMap.GetLength(0)*_tileMap.GetLength(1); }
+        }
+
         public void CreateAllTiles()
         {
             for (short x = _lowAddress; x <= _highAddress; x++)
             {
                 for (short y = _lowAddress; y <= _highAddress; y++)
                 {
-                    CreateTile(new MapCordinate(x, y),false);
+                    CreateTile(new Vector3(x, y,0),false);
                 }
             }
 
@@ -77,29 +72,27 @@ namespace Nantuko.ManicEngine
             }
         }
 
-        internal List<Tile> GetBorderingTiles(Tile tile)
+        internal Tile[] GetBorderingTiles(Tile tile)
         {
-            //return null;
+            var tileList = new List<Tile>();
 
-            List<Tile> tileList = new List<Tile>();
-
-            short xOrg = tile.X;
-            short yOrg = tile.Y;
+            short xOrg = (short)Math.Round(tile.X);
+            short yOrg = (short)Math.Round(tile.Y);
 
             short xMin = (short) (xOrg - 1);
             short yMin = (short) (yOrg - 1);
             short xMax = (short) (xOrg + 1);
-            short yMax = (short) (xOrg + 1);
+            short yMax = (short) (yOrg + 1);
 
             if (xOrg <= _lowAddress) xMin = _lowAddress;
             if (xOrg >= _highAddress) xMax = _highAddress;
             if (yOrg <= _lowAddress) yMin = _lowAddress;
             if (yOrg >= _highAddress) yMax = _highAddress;
 
-            MapCordinate lowerBound = new MapCordinate(xMin, yMin);
-            MapCordinate upperBound = new MapCordinate(xMax, yMax);
+            Vector3 lowerBound = new Vector3(xMin, yMin,0);
+            Vector3 upperBound = new Vector3(xMax, yMax,0);
 
-            Tile[,] tiles = GetTiles(lowerBound, upperBound);
+            var tiles = GetTiles(lowerBound, upperBound);
 
             for (int x = 0; x < tiles.GetLength(0); x++)
             {
@@ -109,111 +102,117 @@ namespace Nantuko.ManicEngine
                 }
             }
 
-            return tileList;
+            return tileList.ToArray();
         }
 
-        private bool IsTileCordinateValid(MapCordinate cordinate)
+        private bool IsTileCordinateValid(Vector3 cordinate)
         {
             return cordinate.X <= _highAddress && cordinate.X >= _lowAddress && cordinate.Y <= _highAddress && cordinate.Y >= _lowAddress;
         }
 
-        private MapCordinate ArrayToWorld(ArrayCordinate cordinate)
+        private Vector3 ArrayToWorld(Vector3 cordinate)
         {
-            return new MapCordinate((short) (cordinate.X - _highAddress), (short) (cordinate.Y - _highAddress));
+            return new Vector3(cordinate.X - _highAddress, cordinate.Y - _highAddress, cordinate.Z);
         }
 
-        private ArrayCordinate WorldToArray(MapCordinate cordinate)
+        private Vector3 WorldToArray(Vector3 cordinate)
         {
-            return new ArrayCordinate((short)(cordinate.X + _highAddress), (short)(cordinate.Y + _highAddress));
+            return new Vector3((cordinate.X + _highAddress), (cordinate.Y + _highAddress),cordinate.Z);
         }
 
-        public Tile GetTile(MapCordinate cordinate)
+        public Tile GetTile(Vector3 cordinate)
         {
             Tile tile = null;
 
             if (IsTileCordinateValid(cordinate))
             {
-                ArrayCordinate arrayCordinate = WorldToArray(cordinate);
+                Vector3 arrayCordinate = WorldToArray(cordinate);
 
-                tile = _tileMap[arrayCordinate.X, arrayCordinate.Y];
+                tile = _tileMap[(int)Math.Round(arrayCordinate.X), (int)Math.Round(arrayCordinate.Y)];
             }
 
             return tile; 
         }
 
-        public Tile[,] GetTiles(MapCordinate lowerBound, MapCordinate upperBound)
+        public Tile[,] GetTiles(Vector3 lowerBound, Vector3 upperBound)
         {
-            short xLower = Math.Min(lowerBound.X, upperBound.X);
-            short xUpper = Math.Max(lowerBound.X, upperBound.X);
-            short yLower = Math.Min(lowerBound.Y, upperBound.Y);
-            short yUpper = Math.Max(lowerBound.Y, upperBound.Y);
+            short xLowerIn = (short)Math.Floor(lowerBound.X);
+            short yLowerIn = (short)Math.Floor(lowerBound.Y);
+            short xUpperIn = (short)Math.Floor(upperBound.X);
+            short yUpperIn = (short)Math.Floor(upperBound.Y);
 
-            lowerBound = new MapCordinate(xLower, yLower);
-            upperBound = new MapCordinate(xUpper, yUpper);
+            short xLower = Math.Min(xLowerIn, xUpperIn);
+            short xUpper = Math.Max(xLowerIn, xUpperIn);
+            short yLower = Math.Min(yLowerIn, yUpperIn);
+            short yUpper = Math.Max(yLowerIn, yUpperIn);
 
-            ArrayCordinate lowerWorldArrayBound = WorldToArray(lowerBound);
-            ArrayCordinate upperWorldArrayBound = WorldToArray(upperBound);
+            lowerBound = new Vector3(xLower, yLower, 0);
+            upperBound = new Vector3(xUpper, yUpper, 0);
 
-            short xMax = (short) (upperWorldArrayBound.X - lowerWorldArrayBound.X + 1);
-            short yMax = (short) (upperWorldArrayBound.Y - lowerWorldArrayBound.Y + 1);
+            Vector3 lowerWorldArrayBound = WorldToArray(lowerBound);
+            Vector3 upperWorldArrayBound = WorldToArray(upperBound);
+
+            short xMax = (short) Math.Round(upperWorldArrayBound.X - lowerWorldArrayBound.X + 1);
+            short yMax = (short) Math.Round(upperWorldArrayBound.Y - lowerWorldArrayBound.Y + 1);
 
             var tiles = new Tile[xMax, yMax];
 
-            for (short x = 0; x < xMax; x++)
+            for (int x = 0; x < xMax; x++)
             {
-                for (short y = 0; y < yMax; y++)
+                for (int y = 0; y < yMax; y++)
                 {
-                    short xMap = (short) (x + lowerBound.X);
-                    short yMap = (short) (y + lowerBound.Y);
+                    float xMap =  x + lowerBound.X;
+                    float yMap =  y + lowerBound.Y;
 
-                    tiles[x, y] = GetTile(new MapCordinate(xMap, yMap));
+                    tiles[x, y] = GetTile(new Vector3(xMap, yMap, 0));
                 }
             }
 
             return tiles;
         }
 
-        public MapCordinate GetTileCordinate(Tile tile)
+        public Vector3 GetTileCordinate(Tile tile)
         {
-            if (tile == null) return null;
+            if (tile == null) return new Vector3(float.NaN,float.NaN, float.NaN);
 
-            return _tileDictionary.ContainsKey(tile) ? _tileDictionary[tile] : null;
+            return new Vector3(tile.X,tile.Y,0);
         }
 
-        public bool CreateTile(MapCordinate cordinate)
+        public bool CreateTile(Vector3 cordinate)
         {
             return CreateTile(cordinate, true);
         }
 
-        private bool CreateTile(MapCordinate cordinate, bool calculateNeighbours)
+        private bool CreateTile(Vector3 cordinate, bool calculateNeighbours)
         {
             bool creationSucessfull = false;
 
+            cordinate = new Vector3((float)Math.Round(cordinate.X), (float)Math.Round(cordinate.Y), cordinate.Y);
+
             if (IsTileCordinateValid(cordinate))
             {
-                ArrayCordinate arrayCordinate = WorldToArray(cordinate);
+                var arrayCordinate = WorldToArray(cordinate);
+                var x = (char) Math.Floor(arrayCordinate.X);
+                var y = (char) Math.Floor(arrayCordinate.Y);
 
-                if (_tileMap[arrayCordinate.X, arrayCordinate.Y] == null)
+                if (_tileMap[x, y] == null)
                 {
-                    Tile tile = new Tile(cordinate.X, cordinate.Y);
+                    var tile = new Tile(cordinate.X, cordinate.Y);
 
-                    int i = 0;
+                    uint i = 0;
                     foreach (var type in TileProperty.GetTypes())
                     {
-                        double divider = 100.0;
+                        double divider = 100;
 
                         float value = (float)_simplexNoise.Evaluate(cordinate.X / divider, cordinate.Y / divider,6,0.7);
-
                         value = (value + 1)/2;
-
                         value = value * (type.MaxInitialValue - type.MinInitialValue) + type.MinInitialValue;
-
                         tile.SetTileStat(i, value);
+
                         i++;
                     }
 
-                    _tileMap[arrayCordinate.X, arrayCordinate.Y] = tile;
-                    _tileDictionary.Add(tile, cordinate);
+                    _tileMap[x, y] = tile;
 
                     if (calculateNeighbours)
                     {
@@ -225,28 +224,14 @@ namespace Nantuko.ManicEngine
 
                             foreach (var neighbour in neighbours)
                             {
-                                neighbour?.Neighbours.Add(tile);
+                                neighbour?.AddNeighbour(tile);
                             }
                         }
                     }
-
                     creationSucessfull = true;
                 }
             }
-
             return creationSucessfull;
-        }
-
-        private class ArrayCordinate
-        {
-            public short X { get; }
-            public short Y { get; }
-
-            public ArrayCordinate(short x, short y)
-            {
-                X = x;
-                Y = y;
-            }
         }
     }
 }

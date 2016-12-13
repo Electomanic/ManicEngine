@@ -16,57 +16,31 @@ namespace OpenGLGame
     {
         private static readonly Stopwatch Stopwatch = new Stopwatch();
 
-        private Tile[,] _tilesToRender;
+        private const short WorldSize = 512;
+
+        private readonly Tile[,] _tilesToRender;
         private readonly World _world;
         private readonly Random _random = new Random();
-        private const short size = 64;
-
-        MapCordinate renderMin = new MapCordinate(-size, -size);
-        MapCordinate renderMax = new MapCordinate(size, size);
+        private readonly Vector3 _renderMin = new Vector3(-WorldSize, -WorldSize,0);
+        private readonly Vector3 _renderMax = new Vector3(WorldSize, WorldSize,0);
 
         public RenderWindow()
         {
             Console.Title = "ManicEngine - Log";
 
+            long seed = _random.Next(int.MinValue, int.MaxValue); // Old seed: 4768642378678;
+            _world = new World((ushort)Math.Abs(WorldSize), seed);
 
-            long seed = _random.Next(int.MinValue, int.MaxValue); //4768642378678;
-
-            _world = new World((ushort)Math.Abs(size), seed);
-
-
-            Console.WriteLine("Creating World of size " + size + " with seed " + seed);
-
+            Console.WriteLine("Creating World of size " + WorldSize + " with seed " + seed);
             Stopwatch.Start();
             _world.CreateAllTiles();
             Stopwatch.Stop();
-
             Console.WriteLine("World creation time: " + Stopwatch.ElapsedMilliseconds + " ms");
 
-
-
-            _tilesToRender = _world.GetTiles(renderMin, renderMax);
+            _tilesToRender = _world.GetTiles(_renderMin, _renderMax);
 
             RenderFrame += RenderFrameEventHandler;
             Resize += ResizeEventHandler;
-            
-            /*
-            Thread genThread= new Thread(GenThread);
-            genThread.Start();
-            */
-        }
-
-
-        private void GenThread()
-        {
-            for (;;)
-            {
-                for (int i = 0; i < 10000; i++)
-                {
-                    MapCordinate newCordinate = new MapCordinate((short)_random.Next(-size, size), (short)_random.Next(-size, size));
-                    _world.CreateTile(newCordinate);
-                }
-                _tilesToRender = _world.GetTiles(renderMin, renderMax);
-            }
         }
 
         private void ResizeEventHandler(object sender, EventArgs e)
@@ -116,7 +90,7 @@ namespace OpenGLGame
             }
         }
 
-        private void DrawRectangle(MapCordinate cordinate, float with, float height, Color4 color)
+        private void DrawRectangle(Vector3 cordinate, float with, float height, Color4 color)
         {
             int mapWith = _tilesToRender.GetLength(1);
             int mapHeight = _tilesToRender.GetLength(1);

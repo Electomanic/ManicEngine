@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Nantuko.ManicEngine;
+using OpenTK;
 
 namespace ConsoleGame
 {
@@ -33,8 +34,8 @@ namespace ConsoleGame
         {
             Console.Title = "ManicEngine - ConsoleDemo";
 
-            MapCordinate renderMin = new MapCordinate(-5, -5);
-            MapCordinate renderMax = new MapCordinate(5, 5);
+            Vector3 renderMin = new Vector3(-5, -5,0);
+            Vector3 renderMax = new Vector3(5, 5,0);
 
             const ushort size = 5;
             const long seed = 4768642378678;
@@ -84,8 +85,7 @@ namespace ConsoleGame
                 {
                     if (tiles[x, y] != null)
                     {
-                        //Console.ForegroundColor = C
-                        float temperature = tiles[x, y].GetStat(TileProperty.GetType("Temperature"));
+                        float temperature = tiles[x, y].GetStat(0);
                         Console.Write("[" + temperature.ToString("F1") + "]");
                     }
                     else

@@ -18,51 +18,69 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using OpenTK;
 
 namespace Nantuko.ManicEngine
 {
-
-
     public class Tile
     {
-        private readonly Dictionary<int, float> _tileStatsDictionary;
+        //private readonly Dictionary<int, float> _tileStatsDictionary;
 
-        public short X { get; }
-        public short Y { get; }
+        private readonly float[] _stats;
+        private Tile[] _neighbours;
 
-        public List<Tile> Neighbours { get; internal set; }
-        public List<Border> Borders { get; internal set; }
+        private readonly Vector3 _cordinates;
 
-        internal Tile(short x, short y)
+        public float X { get { return _cordinates.X; } }
+        public float Y { get { return _cordinates.Y; } }
+
+        public Tile[] Neighbours
         {
-            X = x;
-            Y = y;
-            _tileStatsDictionary=new Dictionary<int, float>();
+            private get { return _neighbours; }
+            set { _neighbours = value; }
         }
 
-        public float GetStat(int typeindex)
+        internal Tile(float x, float y)
         {
-            return _tileStatsDictionary.ContainsKey(typeindex) ? _tileStatsDictionary[typeindex] : 0f;
+            _cordinates = new Vector3(x,y,0f);
+            //_tileStatsDictionary=new Dictionary<int, float>();
+            _stats = new float[TileProperty.GetTilePropertyCount()];
         }
 
-        public float IncrementTileStatBy(int stat, float value)
+        public void AddNeighbour(Tile neighbour)
         {
-            float newValue = GetStat(stat) + value;
-            SetTileStat(stat, newValue);
+            foreach (var tile in Neighbours)
+            {
+                if (Math.Abs(tile.X - neighbour.X) < 0.5 && Math.Abs(tile.Y - neighbour.Y) < 0.5) break;
+ 
+                Array.Resize(ref _neighbours, Neighbours.Length+1);
+                _neighbours[_neighbours.Length + 1] = neighbour;
+            }
+        }
+
+        public float GetStat(uint typeindex)
+        {
+            return typeindex <= TileProperty.GetTilePropertyCount() ? _stats[typeindex] : float.NaN;
+        }
+
+        public float IncrementTileStatBy(uint typeindex, float value)
+        {
+            float newValue = GetStat(typeindex) + value;
+            SetTileStat(typeindex, newValue);
             return newValue;
         }
 
-        public float DecrementTileStatBy(int stat, float value)
+        public float DecrementTileStatBy(uint typeindex, float value)
         {
-            float newValue = GetStat(stat) - value;
-            SetTileStat(stat, newValue);
+            float newValue = GetStat(typeindex) - value;
+            SetTileStat(typeindex, newValue);
             return newValue;
         }
 
-        public void SetTileStat(int stat, float value)
+        public void SetTileStat(uint typeindex, float value)
         {
-            if (_tileStatsDictionary.ContainsKey(stat)) _tileStatsDictionary[stat] = value;
-            else _tileStatsDictionary.Add(stat,value);
+            if (typeindex <= TileProperty.GetTilePropertyCount()) _stats[typeindex] = value;
         }
     }
 }

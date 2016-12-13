@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using OpenTK;
 
 namespace Nantuko.ManicEngine
 {
@@ -29,7 +30,7 @@ namespace Nantuko.ManicEngine
         /// <param name="mapCordinate1"></param>
         /// <param name="mapCordinate2"></param>
         /// <returns>The generated border if sucessfull or 0 if not</returns>
-        public static long CalculateBorderId(MapCordinate mapCordinate1, MapCordinate mapCordinate2)
+        public static long CalculateBorderId(Vector3 mapCordinate1, Vector3 mapCordinate2)
         {
             long borderId;
 
@@ -49,7 +50,7 @@ namespace Nantuko.ManicEngine
             return borderId;
         }
 
-        private static bool AreNeighbours(MapCordinate mapCordinate1, MapCordinate mapCordinate2)
+        private static bool AreNeighbours(Vector3 mapCordinate1, Vector3 mapCordinate2)
         {
             bool areNeighbours;
 

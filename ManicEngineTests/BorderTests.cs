@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 
 namespace Nantuko.ManicEngine.Tests
 {
@@ -14,11 +15,11 @@ namespace Nantuko.ManicEngine.Tests
         [TestMethod()]
         public void CalculateBorderIdTest()
         {
-            MapCordinate cordinate00 = new MapCordinate(0, 0);
-            MapCordinate cordinate01 = new MapCordinate(0, 1);
-            MapCordinate cordinate10 = new MapCordinate(1, 0);
-            MapCordinate cordinate11 = new MapCordinate(1, 1);
-            MapCordinate cordinate22 = new MapCordinate(2, 2);
+            Vector3 cordinate00 = new Vector3(0, 0, 0);
+            Vector3 cordinate01 = new Vector3(0, 1, 0);
+            Vector3 cordinate10 = new Vector3(1, 0, 0);
+            Vector3 cordinate11 = new Vector3(1, 1, 0);
+            Vector3 cordinate22 = new Vector3(2, 2, 0);
 
             long x = Border.CalculateBorderId(cordinate00, cordinate00);
             long a = Border.CalculateBorderId(cordinate00, cordinate01);

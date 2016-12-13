@@ -47,6 +47,11 @@ namespace Nantuko.ManicEngine
             };
         }
 
+        public static int GetTilePropertyCount()
+        {
+            return TileProperties.Length;
+        }
+
         public static TilePropertyType[] GetTypes()
         {
             return TileProperties;
