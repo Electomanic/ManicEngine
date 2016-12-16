@@ -43,6 +43,7 @@ namespace Nantuko.ManicEngine
             // TODO Read types from file
             TileProperties = new TilePropertyType[]
             {
+                new TilePropertyType("Height", 0, 1, 0, 1, 0),
                 new TilePropertyType("Temperature", -40, 60, 15, 30, 0.1f)
             };
         }

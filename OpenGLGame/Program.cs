@@ -14,11 +14,9 @@ namespace OpenGLGame
         {
             Console.Title = "ManicEngine - Log";
 
-            using (RenderWindow window = new RenderWindow())
-            {
-                window.Title = "ManicEngine - View";
-                window.Run(200, 200);
-            }
+            RenderWindow3D window = new RenderWindow3D();
+            window.Run();
+
         }
     }
 }
